@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import MainNavigation from './shared/components/UIElements/Navigation/MainNavigation';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const Users = lazy(() => import('./users/pages/Users'));
+const NewPlace = lazy(() => import('./places/pages/NewPlace'));
+const UserPlaces = lazy(() => import('./places/pages/UserPlaces'));
+
+const App = () => (
+  <BrowserRouter>
+    <Suspense fallback={<div>Loading ...</div>}>
+    <MainNavigation />
+     <main>
+      <Switch>
+       <Route path='/' component={Users} exact />
+       <Route path='/:userId/places' component={UserPlaces} exact />
+       <Route path='/places/new' component={NewPlace} exact />
+       <Redirect to='/' />
+      </Switch>
+     </main>
+    </Suspense>
+  </BrowserRouter>
+);
 
 export default App;
