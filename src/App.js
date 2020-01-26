@@ -5,6 +5,7 @@ import MainNavigation from './shared/components/UIElements/Navigation/MainNaviga
 const Users = lazy(() => import('./users/pages/Users'));
 const NewPlace = lazy(() => import('./places/pages/NewPlace'));
 const UserPlaces = lazy(() => import('./places/pages/UserPlaces'));
+const UpdatePlace = lazy(() => import('./places/pages/UpdatePlace'));
 
 const App = () => (
   <BrowserRouter>
@@ -15,6 +16,7 @@ const App = () => (
        <Route path='/' component={Users} exact />
        <Route path='/:userId/places' component={UserPlaces} exact />
        <Route path='/places/new' component={NewPlace} exact />
+       <Route path='/places/:placeId' component={UpdatePlace} exact />
        <Redirect to='/' />
       </Switch>
      </main>
