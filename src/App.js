@@ -6,6 +6,7 @@ const Users = lazy(() => import('./users/pages/Users'));
 const NewPlace = lazy(() => import('./places/pages/NewPlace'));
 const UserPlaces = lazy(() => import('./places/pages/UserPlaces'));
 const UpdatePlace = lazy(() => import('./places/pages/UpdatePlace'));
+const AuthPage = lazy(() => import('./users/pages/Auth'));
 
 const App = () => (
   <BrowserRouter>
@@ -17,6 +18,7 @@ const App = () => (
        <Route path='/:userId/places' component={UserPlaces} exact />
        <Route path='/places/new' component={NewPlace} exact />
        <Route path='/places/:placeId' component={UpdatePlace} exact />
+       <Route path='/auth' component={AuthPage} exact />
        <Redirect to='/' />
       </Switch>
      </main>
