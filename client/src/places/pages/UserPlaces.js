@@ -6,6 +6,7 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 
 import Spin from '../../shared/components/UIElements/Spin/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal/ErrorModal';
+import Card from '../../shared/components/UIElements/Card/Card';
 
 const UserPlaces = () => {
     const userId = useParams().userId;
@@ -22,12 +23,26 @@ const UserPlaces = () => {
         fetchPlaces();
     }, [sendRequest, userId])
 
+    const placeDeletedHandler = deletedPlaceId => {
+        setLoadedPlaces(prevState => prevState.filter(place => place.id !== deletedPlaceId));
+    };
+
+    if (!loading && loadedPlaces && loadedPlaces.places.length === 0) {
+         return (
+            <div className='center'>
+             <Card>
+               <h2>No places found</h2>
+             </Card>
+            </div>
+         );
+    }
+
     return (
         <>
          <ErrorModal error={error} onClear={clearError}  />
          { loading && <Spin asOverlay /> }
          {
-             !loading && loadedPlaces && <PlaceList items={loadedPlaces} />
+             !loading && loadedPlaces && loadedPlaces.length > 0 && <PlaceList items={loadedPlaces} onDelete={placeDeletedHandler} />
          }
         </>
     )

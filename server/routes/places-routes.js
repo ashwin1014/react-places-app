@@ -17,6 +17,21 @@ router.post('/',
     check('coordinates').not().isEmpty(),
     check('address').not().isEmpty()],
   placesControllers.createPlace);
+// dummy api
+router.post('/createonly',
+  [
+    check('title').not().isEmpty(),
+    check('description').isLength({ min: 5 }),
+    check('coordinates').not().isEmpty(),
+    check('address').not().isEmpty()],
+  placesControllers.simpleCreatePlace);
+router.patch('/updateuserplace',
+  [
+    check('title').not().isEmpty(),
+    check('description').isLength({ min: 5 }),
+    check('coordinates').not().isEmpty(),
+    check('address').not().isEmpty()],
+  placesControllers.addPlaceToUser);
 // update place
 router.patch('/:pid',
   [

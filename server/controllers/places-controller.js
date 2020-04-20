@@ -6,7 +6,7 @@ const { validationResult } = require('express-validator');
 
 const mongoose = require('mongoose');
 const HttpError = require('../models/http-error');
-const getCoordsForAddress = require('../util/location');
+// const getCoordsForAddress = require('../util/location');
 const Place = require('../models/place-schema');
 const User = require('../models/user-schema');
 // const mongoose = require('mongoose');
@@ -77,6 +77,88 @@ const getPlacesByUserId = async (req, res, next) => {
   }
   // res.json({ places });
   res.json({ places: userPlaces.places.map((place) => place.toObject({ getters: true })) });
+};
+
+const simpleCreatePlace = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpError('All fields need to be filled', 422));
+  }
+  const {
+    title, description, coordinates, address, creator, image
+  } = req.body;
+
+  const createdPlace = new Place({
+    title,
+    description,
+    address,
+    location: coordinates,
+    creator,
+    image
+  });
+  try {
+    await createdPlace.save();
+  }
+  catch (err) {
+    const error = new HttpError(err, 500);
+    return next(error);
+  }
+
+  res.status(201).json({ place: createdPlace });
+};
+
+// some problem TODO
+const addPlaceToUser = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(new HttpError('All fields need to be filled', 422));
+  }
+  const {
+    title, description, coordinates, address, creator, image
+  } = req.body;
+
+  const createdPlace = new Place({
+    title,
+    description,
+    address,
+    location: coordinates,
+    creator,
+    image
+  });
+
+  let user;
+
+  try {
+    user = await User.findById(creator);
+  }
+  catch (err) {
+    const error = new HttpError(
+      'Creating Place failed, please try again',
+      500
+    );
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError(
+      'Could not find user for provided id',
+      404
+    );
+    return next(error);
+  }
+
+  if (user) {
+    try {
+      user.places.push(createdPlace);
+      await user.save();
+    }
+    catch (err) {
+      const error = new HttpError(err, 500);
+      return next(error);
+    }
+  }
+
+  res.status(200).json({ message: 'Added Successfully' });
 };
 
 const createPlace = async (req, res, next) => {
@@ -253,3 +335,5 @@ exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlaceById = updatePlaceById;
 exports.deletePlace = deletePlace;
+exports.simpleCreatePlace = simpleCreatePlace;
+exports.addPlaceToUser = addPlaceToUser;

@@ -80,6 +80,7 @@ const NewPlace = () => {
 
     const placeSubmitHandler = async (event) => {
         event.preventDefault();
+        // using transactions
         try {
             await sendRequest('http://localhost:5000/api/places', 'POST', JSON.stringify({
                 title: formState.inputs.title.value,
@@ -95,7 +96,38 @@ const NewPlace = () => {
             // Redirect
             history.push('/');
         } catch (err) {}
-        // console.log(formState.inputs);
+       
+        // // without transactions -> 2 separate apis
+        // try {
+        //     await sendRequest('http://localhost:5000/api/places/createonly', 'POST', JSON.stringify({
+        //         title: formState.inputs.title.value,
+        //         description: formState.inputs.description.value,
+        //         address: formState.inputs.address.value,
+        //         image: formState.inputs.image.value,
+        //         coordinates: {
+        //             lat: Number(formState.inputs.latitude.value), 
+        //             lng: Number(formState.inputs.longitude.value),
+        //         },
+        //         creator: auth.userId
+        //     })).then(() => {
+        //         sendRequest('http://localhost:5000/api/places/updateuserplace', 'PATCH', JSON.stringify({
+        //         title: formState.inputs.title.value,
+        //         description: formState.inputs.description.value,
+        //         address: formState.inputs.address.value,
+        //         image: formState.inputs.image.value,
+        //         coordinates: {
+        //             lat: Number(formState.inputs.latitude.value), 
+        //             lng: Number(formState.inputs.longitude.value),
+        //         },
+        //         creator: auth.userId
+        //       })).then(() =>  history.push('/')).catch((err) => {
+        //         throw new Error('Something went wrong!!');
+        //       })
+        //     });
+        //     // // Redirect
+        //     // history.push('/');
+        // } catch (err) {}
+
     };
 
     return (
