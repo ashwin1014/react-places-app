@@ -5,6 +5,7 @@ import './PlaceForm.css';
 import Input from '../../shared/components/FormElements/Input/Input';
 import Button from '../../shared/components/FormElements/Button/Button';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal/ErrorModal';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload/ImageUpload';
 import Spin from '../../shared/components/UIElements/Spin/LoadingSpinner';
 import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from '../../shared/Util/validators';
 import { useForm } from '../../shared/hooks/form-hook';
@@ -69,6 +70,10 @@ const NewPlace = () => {
         address: {
             value: '',
             isValid: false
+        },
+        image: {
+            value: null,
+            isValid: false
         }
     };
 
@@ -82,17 +87,18 @@ const NewPlace = () => {
         event.preventDefault();
         // using transactions
         try {
-            await sendRequest('http://localhost:5000/api/places', 'POST', JSON.stringify({
-                title: formState.inputs.title.value,
-                description: formState.inputs.description.value,
-                address: formState.inputs.address.value,
-                image: formState.inputs.image.value,
-                coordinates: {
-                    lat: Number(formState.inputs.latitude.value), 
-                    lng: Number(formState.inputs.longitude.value),
-                },
-                creator: auth.userId
-            }))
+            const  coordinates = {
+                lat: Number(formState.inputs.latitude.value), 
+                lng: Number(formState.inputs.longitude.value),
+            };
+            const formData = new FormData();
+            formData.append('title', formState.inputs.title.value);
+            formData.append('description', formState.inputs.description.value);
+            formData.append('address', formState.inputs.address.value);
+            formData.append('coordinates', coordinates);
+            formData.append('image', formState.inputs.image.value);
+
+            await sendRequest('http://localhost:5000/api/places', 'POST', formData)
             // Redirect
             history.push('/');
         } catch (err) {}
@@ -144,7 +150,7 @@ const NewPlace = () => {
             <Input label='Address'  element='input' id='address' errorText='Please enter a valid address' validators={[VALIDATOR_REQUIRE()]} onInput={inputHandler} />
             <Input label='Latitude'  element='input' id='latitude' type='number' errorText='Please enter a valid Latitude' validators={[VALIDATOR_REQUIRE()]} onInput={inputHandler} />
             <Input label='Longitude'  element='input' id='longitude' type='number' errorText='Please enter a valid Longitude' validators={[VALIDATOR_REQUIRE()]} onInput={inputHandler} />
-            <Input label='Image URL'  element='input' id='image' type='text' errorText='Please enter a valid address' validators={[VALIDATOR_REQUIRE()]} onInput={inputHandler} />
+            <ImageUpload errorText='Please provide an image' id='image' onInput={inputHandler} />
             <Button type='submit' disabled={!formState.isValid}>Add Place</Button> 
         </form>
        </>

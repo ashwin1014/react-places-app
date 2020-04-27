@@ -2,6 +2,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable linebreak-style */
 // const { v4: uuid } = require('uuid');
+const fs = require('fs');
 const { validationResult } = require('express-validator');
 
 const mongoose = require('mongoose');
@@ -171,7 +172,7 @@ const createPlace = async (req, res, next) => {
     return next(new HttpError('All fields need to be filled', 422));
   }
   const {
-    title, description, coordinates, address, creator, image
+    title, description, coordinates, address, creator
   } = req.body; // data comes from bodyParser
 
   // use below method if you need to get coordinates from google geocoding api
@@ -200,7 +201,7 @@ const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     creator,
-    image
+    image: req.file.path
   });
 
   // DUMMY_PLACES.unshift(createdPlace);
@@ -314,6 +315,8 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = place.image;
+
   try {
     // await place.remove();
     const currentSession = await mongoose.startSession();
@@ -327,6 +330,9 @@ const deletePlace = async (req, res, next) => {
     const error = new HttpError(err, 500);
     return next(error);
   }
+  fs.unlink(imagePath, err => {
+    console.log(err);
+  });
   res.status(200).json({ message: 'Deleted Successfully' });
 };
 

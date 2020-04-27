@@ -23,19 +23,28 @@ export const getApi = async (url) => {
     return apiBody;
 };
 
-export const postApi = async (url, body) => {
+export const postApi = async (url, body, isFormData = false) => {
     let apiBody = {
         error: null,
         response: null
     };
     try {
-        const getResponse = await fetch (url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
+        let getResponse;
+        if (!isFormData) {
+            getResponse = await fetch (url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+        }
+        if (isFormData) {
+            getResponse = await fetch (url, {
+                method: 'POST',
+                body
+            });
+        }
         const response = await getResponse.json();
         // checks for status 200 else go to catch block
         if(!getResponse.ok) {

@@ -77,7 +77,7 @@ const signup = async (req, res, next) => {
     email,
     name,
     password,
-    image: 'https://randomuser.me/api/portraits/women/65.jpg',
+    image: req.file.path,
     places: []
   });
 
