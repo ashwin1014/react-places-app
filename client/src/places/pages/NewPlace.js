@@ -97,8 +97,10 @@ const NewPlace = () => {
             formData.append('address', formState.inputs.address.value);
             formData.append('coordinates', coordinates);
             formData.append('image', formState.inputs.image.value);
-
-            await sendRequest('http://localhost:5000/api/places', 'POST', formData)
+            // formData.append('creator', auth.userId); -> handled in server
+            await sendRequest('http://localhost:5000/api/places', 'POST', formData, {
+                Authorization: 'Bearer ' + auth.token
+            })
             // Redirect
             history.push('/');
         } catch (err) {}

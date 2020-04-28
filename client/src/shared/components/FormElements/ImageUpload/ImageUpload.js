@@ -42,7 +42,7 @@ const ImageUpload = ({ id, center = false, onInput, errorText = '' }) => {
 
     return (
         <div className='form-control'>
-           <input type='file' ref={filePickerRef} id={id} style={{ display: 'none' }} accept='.jpg.jpeg.png' onChange={pickedHandler} />
+           <input type='file' ref={filePickerRef} id={id} style={{ display: 'none' }} accept='.jpg, .jpeg, .png' onChange={pickedHandler} />
            <div className={`image-upload ${center && 'center'}`}>
                 <div className='image-upload__preview'>
                      { previewUrl && <img src={previewUrl} alt=''/> }

@@ -1,6 +1,8 @@
 /* eslint-disable consistent-return */
 // const { v4: uuid } = require('uuid');
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const HttpError = require('../models/http-error');
 
@@ -73,10 +75,18 @@ const signup = async (req, res, next) => {
   //   image
   // };
 
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError('User creation failed', 500);
+    return next(error);
+  }
+
   const createdUser = new User({
     email,
     name,
-    password,
+    password: hashedPassword,
     image: req.file.path,
     places: []
   });
@@ -96,7 +106,23 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  let token;
+
+  try {
+    token = jwt.sign({
+      userId: createdUser.id,
+      email: createdUser.email
+    }, 'secret_key', { expiresIn: '1h' });
+  } catch (err) {
+    const body = {
+      message: 'Sign up failed, please try again',
+      errorCause: err
+    };
+    const error = new HttpError(body, 500);
+    return next(error);
+  }
+
+  res.status(201).json({ user: createdUser.id, email: createdUser.email, token });
 };
 
 const login = async (req, res, next) => {
@@ -123,14 +149,44 @@ const login = async (req, res, next) => {
     };
     const error = new HttpError(body, 500);
     return next(error);
-  }
+  }  
 
-  if (!isExistingUser || isExistingUser.password !== password) {
+  if (!isExistingUser) {
     const error = new HttpError('Invalid credentials', 401);
     return next(error);
   }
 
-  res.json({ message: 'Logged In', user: isExistingUser.toObject({ getters: true }) });
+  let isValidPassword = false;
+  
+  try {
+    isValidPassword = await bcrypt.compare(password, isExistingUser.password);
+  } catch (err) {
+    const error = new HttpError('Please check you credentials', 500);
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError('Please check you credentials', 500);
+    return next(error);
+  }
+
+  let token;
+
+  try {
+    token = jwt.sign({
+      userId: isExistingUser.id,
+      email: isExistingUser.email
+    }, 'secret_key', { expiresIn: '1h' });
+  } catch (err) {
+    const body = {
+      message: 'Login failed, please try again',
+      errorCause: err
+    };
+    const error = new HttpError(body, 500);
+    return next(error);
+  }
+
+  res.json({ userId: isExistingUser.id, email: isExistingUser.email, token });
 };
 
 

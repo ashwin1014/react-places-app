@@ -23,7 +23,10 @@ const PlaceItem = ({ id, image, title, description, address, creatorId, coordina
     const showDeleteWarningHandler = async () => {
         setShowConfirmModal(true);
        try {
-           await  sendRequest(`http://localhost:5000/api/places/${id}`, 'DELETE');
+           await  sendRequest(`http://localhost:5000/api/places/${id}`, 'DELETE', null, {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + auth.token
+           });
            onDelete(id);
        } catch(err) {}
     };

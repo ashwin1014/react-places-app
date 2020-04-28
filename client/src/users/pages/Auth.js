@@ -41,7 +41,7 @@ const Auth = () => {
 
             if (response) {
                 setIsLoading(false);
-                auth.login(response.user.id);
+                auth.login(response.userId);
             }
 
             if (error) {
@@ -66,7 +66,7 @@ const Auth = () => {
             if (response) {
                 setIsLoading(false);
                 // console.log(response);
-                auth.login();
+                auth.login(response.userId);
             }
 
             if (error) {
