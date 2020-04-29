@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 // const MONGO_URI = 'mongodb+srv://ashwin1014:CCVUfJ3MNclVdIAd@cluster0-tcq8f.mongodb.net/places?retryWrites=true&w=majority';
-const MONGO_URI = 'mongodb://127.0.0.1:27017/mern?retryWrites=false&?replicaSet=rs';
+const MONGO_URI = `mongodb://127.0.0.1:27017/${process.env.DB_NAME}?retryWrites=false&?replicaSet=rs`;
 // const MONGO_URI = 'mongodb://ashwin1014:27017,ashwin1014:27018,ashwin1014:27019/places?replicaSet=rs';
 
 const placesRoutes = require('./routes/places-routes');
@@ -66,7 +66,7 @@ const fixDeprecationWarnings = {
 
 mongoose.connect(MONGO_URI, fixDeprecationWarnings)
   .then(() => {
-    app.listen(5000);
+    app.listen(process.env.PORT || 5000);
     console.info('Connection Established, Server Started');
   })
   .catch((err) => {
